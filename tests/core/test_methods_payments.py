@@ -87,16 +87,19 @@ class TestCreatePayment:
 
     def test_create_payment_build_params_with_all_fields(self):
         """Test CreatePayment build_params with all fields."""
-        amount = PaymentAmount(value=100.50, currency=Currency.RUB)
-        card = CardInfo(
-            last4="1234", expiry_year="2025", expiry_month="12", card_type="Visa"
+        from aioyookassa.types.params import (
+            BankCardPaymentMethodData,
+            PaymentMethodCardData,
         )
-        payment_method = PaymentMethod(
-            type=PaymentMethodType.CARD,
-            id="pm_123456789",
-            saved=True,
-            status=PaymentMethodStatus.ACTIVE,
-            card=card,
+
+        amount = PaymentAmount(value=100.50, currency=Currency.RUB)
+        payment_method_data = BankCardPaymentMethodData(
+            type="bank_card",
+            card=PaymentMethodCardData(
+                number="4111111111111111",
+                expiry_year="2025",
+                expiry_month="12",
+            ),
         )
         confirmation = Confirmation(
             type=ConfirmationType.REDIRECT,
@@ -132,7 +135,7 @@ class TestCreatePayment:
             recipient=recipient,
             payment_token="payment_token_123",
             payment_method_id="pm_123456789",
-            payment_method_data=payment_method,
+            payment_method_data=payment_method_data,
             confirmation=confirmation,
             save_payment_method=True,
             capture=True,

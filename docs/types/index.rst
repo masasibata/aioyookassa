@@ -9,6 +9,7 @@ Types
 .. toctree::
     enum
     payment
+    params
 
 Типы для выплат
 ---------------

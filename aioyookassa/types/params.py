@@ -29,10 +29,134 @@ from .payment import (
     Recipient,
     Settlement,
     Transfer,
+    VatData,
 )
 from .payout import SelfEmployed, SelfEmployedConfirmation
 from .receipt_registration import AdditionalUserProps, ReceiptRegistrationItem
 from .refund import RefundDeal, RefundMethod, RefundSource
+
+
+# Payment Method Card Data (shared between Payment Methods API and Payment Method Data)
+class PaymentMethodCardData(BaseModel):
+    """Bank card data for payment method creation."""
+
+    number: str
+    expiry_year: str  # Format: YYYY
+    expiry_month: str  # Format: MM
+    cardholder: Optional[str] = None
+    csc: Optional[str] = None  # CVC2 or CVV2 code
+
+
+# Payment Method Data Models for CreatePaymentParams
+class ElectronicCertificateArticle(BaseModel):
+    """Article for electronic certificate payment."""
+
+    article_number: int  # 1-999
+    tru_code: str  # 30 characters, format: NNNNNNNNN.NNNNNNNNNYYYYMMMMZZZ
+    article_code: Optional[str] = None  # Max 128 characters
+    article_name: str  # Max 128 characters
+    quantity: int  # Positive integer
+    price: PaymentAmount
+    metadata: Optional[dict] = None
+
+
+class ElectronicCertificateData(BaseModel):
+    """Electronic certificate data from FES NSPK."""
+
+    amount: PaymentAmount
+    basket_id: str
+
+
+class SberLoanPaymentMethodData(BaseModel):
+    """Sber Loan payment method data."""
+
+    type: str = "sber_loan"
+
+
+class MobileBalancePaymentMethodData(BaseModel):
+    """Mobile balance payment method data."""
+
+    type: str = "mobile_balance"
+    phone: str  # ITU-T E.164 format, e.g., 79000000000
+
+
+class BankCardPaymentMethodData(BaseModel):
+    """Bank card payment method data."""
+
+    type: str = "bank_card"
+    card: Optional[PaymentMethodCardData] = None
+
+
+class CashPaymentMethodData(BaseModel):
+    """Cash payment method data."""
+
+    type: str = "cash"
+    phone: Optional[str] = None  # ITU-T E.164 format, e.g., 79000000000
+
+
+class SberBnplPaymentMethodData(BaseModel):
+    """Sber BNPL payment method data."""
+
+    type: str = "sber_bnpl"
+    phone: Optional[str] = None  # ITU-T E.164 format, max 15 characters
+
+
+class SbpPaymentMethodData(BaseModel):
+    """SBP payment method data."""
+
+    type: str = "sbp"
+
+
+class B2BSberbankPaymentMethodData(BaseModel):
+    """B2B Sberbank payment method data."""
+
+    type: str = "b2b_sberbank"
+    payment_purpose: str  # Max 210 characters
+    vat_data: VatData
+
+
+class ElectronicCertificatePaymentMethodData(BaseModel):
+    """Electronic certificate payment method data."""
+
+    type: str = "electronic_certificate"
+    articles: Optional[List[ElectronicCertificateArticle]] = None
+    card: Optional[PaymentMethodCardData] = None
+    electronic_certificate: Optional[ElectronicCertificateData] = None
+
+
+class YooMoneyPaymentMethodData(BaseModel):
+    """YooMoney payment method data."""
+
+    type: str = "yoo_money"
+
+
+class SberbankPaymentMethodData(BaseModel):
+    """Sberbank payment method data."""
+
+    type: str = "sberbank"
+    phone: Optional[str] = None  # ITU-T E.164 format, e.g., 79000000000
+
+
+class TinkoffBankPaymentMethodData(BaseModel):
+    """Tinkoff Bank payment method data."""
+
+    type: str = "tinkoff_bank"
+
+
+# Union type for all payment method data
+PaymentMethodData = Union[
+    SberLoanPaymentMethodData,
+    MobileBalancePaymentMethodData,
+    BankCardPaymentMethodData,
+    CashPaymentMethodData,
+    SberBnplPaymentMethodData,
+    SbpPaymentMethodData,
+    B2BSberbankPaymentMethodData,
+    ElectronicCertificatePaymentMethodData,
+    YooMoneyPaymentMethodData,
+    SberbankPaymentMethodData,
+    TinkoffBankPaymentMethodData,
+]
 
 
 # Payments API Parameters
@@ -45,7 +169,7 @@ class CreatePaymentParams(BaseModel):
     recipient: Optional[Recipient] = None
     payment_token: Optional[str] = None
     payment_method_id: Optional[str] = None
-    payment_method_data: Optional[PaymentMethod] = None
+    payment_method_data: Optional[PaymentMethodData] = None
     confirmation: Optional[Confirmation] = None
     save_payment_method: Optional[bool] = False
     capture: Optional[bool] = False
@@ -152,16 +276,6 @@ class GetReceiptsParams(BaseModel):
 
 
 # Payment Methods API Parameters
-class PaymentMethodCardData(BaseModel):
-    """Bank card data for payment method creation."""
-
-    number: str
-    expiry_year: str  # Format: YYYY
-    expiry_month: str  # Format: MM
-    cardholder: Optional[str] = None
-    csc: Optional[str] = None  # CVC2 or CVV2 code
-
-
 class PaymentMethodHolder(BaseModel):
     """Holder data for payment method creation."""
 

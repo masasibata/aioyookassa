@@ -100,6 +100,20 @@ class TestPaymentsAPI:
         """Test create_payment with all parameters."""
         mock_client._send_request.return_value = sample_payment_data
 
+        from aioyookassa.types.params import (
+            BankCardPaymentMethodData,
+            PaymentMethodCardData,
+        )
+
+        payment_method_data = BankCardPaymentMethodData(
+            type="bank_card",
+            card=PaymentMethodCardData(
+                number="4111111111111111",
+                expiry_year="2025",
+                expiry_month="12",
+            ),
+        )
+
         params = CreatePaymentParams(
             amount=sample_payment_amount,
             description="Test payment",
@@ -107,7 +121,7 @@ class TestPaymentsAPI:
             recipient=sample_recipient,
             payment_token="payment_token_123",
             payment_method_id="pm_123456789",
-            payment_method_data=sample_payment_method,
+            payment_method_data=payment_method_data,
             confirmation=sample_confirmation,
             save_payment_method=True,
             capture=True,

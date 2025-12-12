@@ -31,6 +31,7 @@ API Reference
    
    types/payment
    types/enum
+   types/params
    types/refund
    types/invoice
    types/receipt-registration

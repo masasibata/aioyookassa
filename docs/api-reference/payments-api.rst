@@ -27,6 +27,57 @@ create_payment
     )
     payment = await client.payments.create_payment(params)
 
+Создание платежа с указанием способа оплаты
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Вы можете указать способ оплаты при создании платежа, используя параметр ``payment_method_data``:
+
+.. code-block:: python
+
+    from aioyookassa.types.params import (
+        CreatePaymentParams,
+        BankCardPaymentMethodData,
+        PaymentMethodCardData,
+        MobileBalancePaymentMethodData,
+        SbpPaymentMethodData,
+    )
+    
+    # Платеж банковской картой
+    params = CreatePaymentParams(
+        amount=PaymentAmount(value=100.00, currency=Currency.RUB),
+        payment_method_data=BankCardPaymentMethodData(
+            type="bank_card",
+            card=PaymentMethodCardData(
+                number="4111111111111111",
+                expiry_year="2025",
+                expiry_month="12",
+                cardholder="John Doe",
+                csc="123"
+            )
+        ),
+        confirmation=Confirmation(type=ConfirmationType.REDIRECT, return_url="https://example.com/return")
+    )
+    payment = await client.payments.create_payment(params)
+    
+    # Платеж с баланса мобильного телефона
+    params = CreatePaymentParams(
+        amount=PaymentAmount(value=100.00, currency=Currency.RUB),
+        payment_method_data=MobileBalancePaymentMethodData(
+            type="mobile_balance",
+            phone="79000000000"
+        ),
+        confirmation=Confirmation(type=ConfirmationType.REDIRECT, return_url="https://example.com/return")
+    )
+    payment = await client.payments.create_payment(params)
+    
+    # Платеж через СБП
+    params = CreatePaymentParams(
+        amount=PaymentAmount(value=100.00, currency=Currency.RUB),
+        payment_method_data=SbpPaymentMethodData(type="sbp"),
+        confirmation=Confirmation(type=ConfirmationType.REDIRECT, return_url="https://example.com/return")
+    )
+    payment = await client.payments.create_payment(params)
+
 get_payments
 ~~~~~~~~~~~~
 
