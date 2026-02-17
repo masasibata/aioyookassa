@@ -183,27 +183,6 @@ aioyookassa Documentation
    changelog
    contributing
 
-⚠️ **Breaking Changes в версии 2.0.0**
----------------------------------------
-
-**Версия 2.0.0 содержит breaking changes:**
-
-* **Удалены дублирующиеся типы:**
-  * `RefundCancellationDetails` → используйте `CancellationDetails`
-  * `RefundSettlement` → используйте `Settlement`
-  * `ReceiptSettlement` → используйте `Settlement`
-
-**Миграция:**
-
-.. code-block:: python
-
-    # До версии 2.0.0
-    from aioyookassa.types import RefundCancellationDetails, RefundSettlement, ReceiptSettlement
-
-    # Версия 2.0.0+
-    from aioyookassa.types import CancellationDetails, Settlement
-
-Подробности в :doc:`changelog`.
 
 🔗 **Ссылки**
 -------------

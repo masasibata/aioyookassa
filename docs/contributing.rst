@@ -15,7 +15,7 @@ Contributing
 3. Проверьте документацию
 
 **Создание issue:**
-1. Перейдите в `GitHub Issues <https://github.com/your-repo/aioyookassa/issues>`_
+1. Перейдите в `GitHub Issues <https://github.com/masasibata/aioyookassa/issues>`_
 2. Выберите шаблон "Bug Report"
 3. Заполните все необходимые поля
 
@@ -53,7 +53,7 @@ Contributing
 ~~~~~~~~~~~~~~~~~~~
 
 **Создание feature request:**
-1. Перейдите в `GitHub Issues <https://github.com/your-repo/aioyookassa/issues>`_
+1. Перейдите в `GitHub Issues <https://github.com/masasibata/aioyookassa/issues>`_
 2. Выберите шаблон "Feature Request"
 3. Опишите предлагаемую функцию
 
@@ -83,7 +83,7 @@ Contributing
 ~~~~~~~~~~~~~~~~~~~
 
 1. **Форкните репозиторий:**
-   - Перейдите на `GitHub <https://github.com/your-repo/aioyookassa>`_
+   - Перейдите на `GitHub <https://github.com/masasibata/aioyookassa>`_
    - Нажмите "Fork"
 
 2. **Клонируйте форк:**
@@ -489,7 +489,7 @@ Contributing
 - `Tribute <https://t.me/tribute/app?startapp=dzqR>`_
 
 **Репозиторий:**
-- `GitHub <https://github.com/your-repo/aioyookassa>`_
+- `GitHub <https://github.com/masasibata/aioyookassa>`_
 
 **Документация:**
 - `Read the Docs <https://aioyookassa.readthedocs.io>`_

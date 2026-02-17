@@ -31,7 +31,7 @@ Installation
 
 .. code-block:: console
 
-    $ pip install git+https://github.com/your-repo/aioyookassa.git
+    $ pip install git+https://github.com/masasibata/aioyookassa.git
 
 Требования
 ----------

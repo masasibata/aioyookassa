@@ -58,76 +58,15 @@ aioyookassa/
 └── __init__.py            # Package exports
 ```
 
-## ⚠️ Breaking Changes в версии 2.0.0
-
-**Версия 2.0.0 содержит breaking changes:**
-
-- **Переход на Pydantic params:** Все методы API теперь принимают Pydantic модели параметров вместо обычных аргументов функции
-- **Удалены дублирующиеся типы:**
-  - `RefundCancellationDetails` → используйте `CancellationDetails`
-  - `RefundSettlement` → используйте `Settlement`
-  - `ReceiptSettlement` → используйте `Settlement`
-
-**Миграция:**
-
-### Переход на Pydantic params
-
-```python
-# До версии 2.0.0 (обычные аргументы)
-payment = await client.payments.create_payment(
-    amount=Money(value=100.00, currency=Currency.RUB),
-    confirmation=Confirmation(type=ConfirmationType.REDIRECT, return_url="https://example.com/return"),
-    description="Тестовый платеж"
-)
-
-payments = await client.payments.get_payments(
-    created_at=datetime.now(),
-    status=PaymentStatus.SUCCEEDED,
-    limit=10
-)
-
-# Версия 2.0.0+ (Pydantic params)
-from aioyookassa.types.params import CreatePaymentParams, GetPaymentsParams
-
-params = CreatePaymentParams(
-    amount=Money(value=100.00, currency=Currency.RUB),
-    confirmation=Confirmation(type=ConfirmationType.REDIRECT, return_url="https://example.com/return"),
-    description="Тестовый платеж"
-)
-payment = await client.payments.create_payment(params)
-
-params = GetPaymentsParams(
-    created_at=datetime.now(),
-    status=PaymentStatus.SUCCEEDED,
-    limit=10
-)
-payments = await client.payments.get_payments(params)
-```
-
-### Удаленные типы
-
-```python
-# До версии 2.0.0
-from aioyookassa.types import RefundCancellationDetails, RefundSettlement, ReceiptSettlement
-
-# Версия 2.0.0+
-from aioyookassa.types import CancellationDetails, Settlement
-```
-
-Подробности в [Changelog](https://aioyookassa.readthedocs.io/en/latest/changelog.html).
-
 ## 🚀 Quick Start
 
 ### Установка
 
 ```bash
-pip install aioyookassa>=2.0.0
+pip install aioyookassa
 ```
 
 ### Базовое использование
-
-> **Примечание**: В версии 2.1.0 `PaymentAmount` переименован в `Money` для лучшей семантики.
-> `PaymentAmount` все еще доступен как alias для обратной совместимости.
 
 ```python
 import asyncio
