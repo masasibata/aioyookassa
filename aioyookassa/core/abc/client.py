@@ -78,9 +78,12 @@ class BaseAPIClient(abc.ABC):
         :return: ClientSession with connection pooling and timeouts configured
         """
         if self._session is None or self._session.closed:
-            if self._connector is None and self._connector_config:
-                loop = self._get_event_loop()
-                self._connector = TCPConnector(loop=loop, **self._connector_config)
+            # Recreate the auto-created connector alongside the session: ClientSession
+            # owns it and closes it on session close, and a connector bound to a
+            # previous event loop (e.g. between pytest-asyncio tests) raises
+            # "Event loop is closed" on reuse. User-supplied connectors are left alone.
+            if self._connector_config is not None:
+                self._connector = TCPConnector(**self._connector_config)
 
             self._session = ClientSession(
                 connector=self._connector,
@@ -88,18 +91,6 @@ class BaseAPIClient(abc.ABC):
                 headers={"User-Agent": f"aioyookassa/{__version__}"},
             )
         return self._session
-
-    @staticmethod
-    def _get_event_loop() -> Optional[asyncio.AbstractEventLoop]:
-        """
-        Get running event loop or None if not available.
-
-        :return: Running event loop or None
-        """
-        try:
-            return asyncio.get_running_loop()
-        except RuntimeError:
-            return None
 
     async def close(self) -> None:
         """Close aiohttp session."""
