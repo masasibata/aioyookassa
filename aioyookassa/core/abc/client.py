@@ -1,6 +1,7 @@
 import abc
 import asyncio
 import logging
+import sys
 import time
 from typing import Any, Dict, Optional, Type, Union
 
@@ -15,6 +16,14 @@ try:
 except ImportError:
     __version__ = "unknown"
 
+# Workaround for https://github.com/python/cpython/pull/118960 — fixed in 3.12.7 and 3.13.1.
+# On newer Python aiohttp ignores the flag and emits DeprecationWarning, so we only set it where it matters.
+_NEEDS_CLEANUP_CLOSED = (3, 13, 0) <= sys.version_info < (
+    3,
+    13,
+    1,
+) or sys.version_info < (3, 12, 7)
+
 
 class BaseAPIClient(abc.ABC):
     """Base API Client with connection pooling, timeouts, and resource management."""
@@ -26,7 +35,7 @@ class BaseAPIClient(abc.ABC):
         "limit_per_host": 30,
         "ttl_dns_cache": 300,
         "force_close": False,
-        "enable_cleanup_closed": True,
+        **({"enable_cleanup_closed": True} if _NEEDS_CLEANUP_CLOSED else {}),
     }
 
     def __init__(

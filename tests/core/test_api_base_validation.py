@@ -4,8 +4,8 @@ Tests for BaseAPI validation improvements.
 
 import pytest
 
-from aioyookassa.core.api.base import BaseAPI
 from aioyookassa.core.abc.client import BaseAPIClient
+from aioyookassa.core.api.base import BaseAPI
 from aioyookassa.core.methods.payments import GetPayment
 from aioyookassa.types.payment import Payment
 

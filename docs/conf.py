@@ -1,7 +1,7 @@
 project = "aioyookassa"
 copyright = "2022, Masa"
 author = "Masa"
-release = "2.2.5"
+release = "2.2.6"
 
 
 extensions = [
