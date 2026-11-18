@@ -28,11 +28,11 @@ parse_notification
 .. code-block:: python
 
     from aioyookassa.core.webhook_handler import WebhookHandler
-    
+
     handler = WebhookHandler()
     data = await request.json()
     notification = handler.parse_notification(data)
-    
+
     print(f"Event: {notification.event}")
     print(f"Type: {notification.type}")
 
@@ -45,7 +45,7 @@ handle_notification
 
     notification = handler.parse_notification(data)
     event_object = await handler.handle_notification(notification)
-    
+
     # event_object будет типизированным объектом:
     # - Payment для payment.* событий
     # - Refund для refund.* событий
@@ -62,7 +62,7 @@ handle_notification
 
     from aioyookassa.types.enum import WebhookEvent
     from aioyookassa.types.payment import Payment
-    
+
     @handler.register_callback(WebhookEvent.PAYMENT_SUCCEEDED)
     async def on_payment_succeeded(payment: Payment):
         print(f"Payment {payment.id} succeeded")
@@ -96,7 +96,7 @@ add_callback
 
     async def my_handler(payment: Payment):
         print(f"Payment {payment.id} processed")
-    
+
     handler.add_callback(WebhookEvent.PAYMENT_SUCCEEDED, my_handler)
 
 WebhookIPValidator
@@ -114,13 +114,13 @@ WebhookIPValidator
 .. code-block:: python
 
     from aioyookassa.core.webhook_validator import WebhookIPValidator
-    
+
     validator = WebhookIPValidator()
-    
+
     # Проверка IP
     if validator.is_allowed("185.71.76.1"):
         print("IP is allowed")
-    
+
     # Кастомный список IP (для тестирования)
     custom_validator = WebhookIPValidator(
         allowed_ips=["127.0.0.1", "192.168.1.0/24"]
@@ -145,13 +145,13 @@ WebhookServer
     from aioyookassa.contrib.webhook_server import WebhookServer
     from aioyookassa.core.webhook_handler import WebhookHandler
     from aioyookassa.types.enum import WebhookEvent
-    
+
     handler = WebhookHandler()
-    
+
     @handler.register_callback(WebhookEvent.PAYMENT_SUCCEEDED)
     async def on_payment(payment):
         print(f"Payment {payment.id} succeeded")
-    
+
     server = WebhookServer(handler=handler)
     server.run(host="0.0.0.0", port=8080)
 
@@ -161,6 +161,22 @@ WebhookServer
 
     app = server.create_app()
     # Можно добавить дополнительные роуты, middleware и т.д.
+
+Путь эндпоинта по умолчанию — ``/webhook``. Его можно изменить параметром ``path``
+как в ``create_app()``, так и в ``run()``:
+
+.. code-block:: python
+
+    # Запуск сервера с кастомным путём
+    server.run(host="0.0.0.0", port=8080, path="/api/v1/webhooks/yookassa")
+
+    # Монтирование в существующее aiohttp-приложение
+    from aiohttp import web
+
+    app = web.Application()
+    yookassa_app = server.create_app(path="/payments/yookassa/webhook")
+    app.add_subapp("/integration", yookassa_app)
+    # Эндпоинт: /integration/payments/yookassa/webhook
 
 Примеры использования
 ---------------------
@@ -173,25 +189,25 @@ WebhookServer
     from aiohttp import web
     from aioyookassa.core.webhook_handler import WebhookHandler
     from aioyookassa.types.enum import WebhookEvent
-    
+
     handler = WebhookHandler()
-    
+
     @handler.register_callback(WebhookEvent.PAYMENT_SUCCEEDED)
     async def on_payment_succeeded(payment):
         await process_payment(payment)
-    
+
     async def webhook_endpoint(request):
         # Валидация IP
         if not handler.validator.is_allowed(request.remote):
             raise web.HTTPForbidden()
-        
+
         # Обработка
         data = await request.json()
         notification = handler.parse_notification(data)
         await handler.handle_notification(notification)
-        
+
         return web.Response(status=200)
-    
+
     app = web.Application()
     app.router.add_post("/webhook", webhook_endpoint)
     web.run_app(app)
@@ -204,25 +220,25 @@ WebhookServer
     from fastapi import FastAPI, Request, HTTPException
     from aioyookassa.core.webhook_handler import WebhookHandler
     from aioyookassa.types.enum import WebhookEvent
-    
+
     handler = WebhookHandler()
     app = FastAPI()
-    
+
     @handler.register_callback(WebhookEvent.PAYMENT_SUCCEEDED)
     async def on_payment_succeeded(payment):
         await process_payment(payment)
-    
+
     @app.post("/webhook")
     async def webhook_endpoint(request: Request):
         # Валидация IP
         if not handler.validator.is_allowed(request.client.host):
             raise HTTPException(status_code=403)
-        
+
         # Обработка
         data = await request.json()
         notification = handler.parse_notification(data)
         await handler.handle_notification(notification)
-        
+
         return {"status": "ok"}
 
 Валидация IP
@@ -243,7 +259,7 @@ WebhookServer
 .. code-block:: python
 
     from aioyookassa.core.webhook_validator import WebhookIPValidator
-    
+
     # Разрешить все IP (не рекомендуется для production)
     validator = WebhookIPValidator(allowed_ips=["0.0.0.0/0"])
     handler = WebhookHandler(validator=validator)
@@ -265,4 +281,3 @@ WebhookServer
 
 .. automodule:: aioyookassa.exceptions.webhooks
    :members:
-

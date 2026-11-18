@@ -45,14 +45,15 @@ class WebhookServer:
         self.validate_ip = validate_ip
         self.logger.info(f"Initialized WebhookServer: validate_ip={validate_ip}")
 
-    def create_app(self) -> web.Application:
+    def create_app(self, path: str = DEFAULT_WEBHOOK_PATH) -> web.Application:
         """
         Create aiohttp application with webhook endpoint.
 
+        :param path: Webhook endpoint path. Default: /webhook.
         :return: Configured aiohttp Application instance.
         """
         app = web.Application()
-        app.router.add_post(DEFAULT_WEBHOOK_PATH, self._handle_webhook)
+        app.router.add_post(path, self._handle_webhook)
         return app
 
     async def _handle_webhook(self, request: web.Request) -> web.Response:
@@ -116,11 +117,6 @@ class WebhookServer:
         :param port: Port to bind to. Default: 8080.
         :param path: Webhook endpoint path. Default: /webhook.
         """
-        app = self.create_app()
-        if path != DEFAULT_WEBHOOK_PATH:
-            # Update route if custom path provided
-            # Create new app with custom path
-            app = web.Application()
-            app.router.add_post(path, self._handle_webhook)
+        app = self.create_app(path=path)
         self.logger.info(f"Starting webhook server on {host}:{port}{path}")
         web.run_app(app, host=host, port=port)
